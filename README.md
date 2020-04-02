@@ -1,2 +1,4 @@
 # covid-viz
-Exploring covid data
+
+Some exploration of Covid data.
+Trying to keeping it tidy - in Python.

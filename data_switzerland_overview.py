@@ -204,7 +204,7 @@ g = (dat_daily
      + gg.scale_fill_manual(colorcet.glasbey, name='Cantons')
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Covid-19 in Switzerland')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
@@ -266,7 +266,7 @@ g = (dat_daily
                             guide = gg.guide_legend(reverse = True))
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Covid-19 in Switzerland')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
@@ -302,7 +302,7 @@ g = (dat_daily
                             guide = gg.guide_legend(reverse = True))
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Covid-19 in Switzerland')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
@@ -338,7 +338,7 @@ g = (dat_daily
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.scale_y_log10()
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Cases per canton')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
@@ -375,7 +375,7 @@ g = (dat_daily
      + gg.scale_color_manual(colorcet.glasbey)
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Cases per canton')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
@@ -437,7 +437,7 @@ g = (dat_daily
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.scale_y_log10()
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Cases per canton')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
@@ -470,7 +470,7 @@ g = (dat_daily
      + gg.scale_color_manual(colorcet.glasbey)
      + gg.scale_x_datetime(date_breaks='1 week')
      + gg.xlab('Date')
-     + gg.ylab('Cumulative Deaths')
+     + gg.ylab('Cases')
      + gg.ggtitle('Cases per canton')
      + gg.theme_minimal()
      + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),

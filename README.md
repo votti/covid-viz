@@ -1,4 +1,5 @@
 # covid-viz
 
-Some exploration of Covid data.
+Some quick exploration of Covid data from Switzerland.
+
 Trying to keeping it tidy - in Python.

@@ -44,15 +44,14 @@ import glob
 # %%
 class C:
     """
-    This config helper class contains all configuration-like input
+    Helper class to keep input configuration.
     """
     glob_cases = "data/covid_19/fallzahlen_kanton_total_csv/COVID19_Fallzahlen_Kanton_*total.csv"
     
     
 class V:
     """
-    This variable helper class contains all variable related
-    global variables
+    Helper class to keep metadata related variables.
     """
     # User columns
     COL_VARIABLES = 'variables'
@@ -105,21 +104,25 @@ dat_total.columns
 # %%
 dat_total.head()
 
-# %% [markdown]
-# Tiny data cleaning
-
-# %%
-dat_total[V.COL_DATE] = pd.to_datetime(dat_total[V.COL_DATE], dayfirst=True)
-dat_total[V.COL_CANTON] = pd.Categorical(dat_total[V.COL_CANTON])
-
 
 # %% [markdown]
-# Helper functions
+# Helper functions to interpolate data for daily values
 
 # %%
 def transform_daily_per_canton(df, value_cols, col_date=V.COL_DATE, col_canton=V.COL_CANTON,
                                 interpolation='linear'):
-    """Pick out one column of interest"""
+    """
+    Linearily interpolates variables to get daily data.
+    Input:
+        df: a data frame
+        value cols: columns containing the values of interest
+        col_date: column name containing the dates
+        col_canton: columns containing the canton/other grouping
+        interpolation: how to interpolate. See help pd.DataFrame.interpolate(method=
+                       set to 'None' for simple padding of values
+    Returns:
+        Interpolated data with daily values
+    """
     df = (df
           .set_index([col_date, col_canton])
           .loc[:, value_cols]
@@ -162,9 +165,16 @@ def transform_daily_per_canton(df, value_cols, col_date=V.COL_DATE, col_canton=V
 
 
 # %% [markdown]
-# ## Visualizations
+# ## Start Visualizations
 #
 #
+
+# %% [markdown]
+# Parsing of metadata into the right classes
+
+# %%
+dat_total[V.COL_DATE] = pd.to_datetime(dat_total[V.COL_DATE], dayfirst=True)
+dat_total[V.COL_CANTON] = pd.Categorical(dat_total[V.COL_CANTON])
 
 # %% [markdown]
 # Interpolate data to get daily values
@@ -222,7 +232,7 @@ cat_cantons_deceased= pd.CategoricalDtype(cord.astype(str), ordered=True)
 def order_cat(col, ct, rev=False):
     """
     Small helper to convert column to categorical
-    and revert
+    with option to revert order
     """
     col = col.astype(ct)
     if rev:

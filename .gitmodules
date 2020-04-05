@@ -2,7 +2,7 @@
 	path = data/covid/covid_19
 	url = git@github.com:openZH/covid_19.git
 [submodule "data/scrape_covid19_mobility_reports"]
-	path = data/scrape_covid19_mobility_reports
+	path = data/monitoring/scrape_covid19_mobility_reports
 	url = git@github.com:philshem/scrape_covid19_mobility_reports.git
 [submodule "data/COVID-19"]
 	path = data/covid/COVID-19
@@ -10,3 +10,6 @@
 [submodule "data/covid19monitoring"]
 	path = data/monitoring/covid19monitoring
 	url = git@github.com:statistikZH/covid19monitoring.git
+[submodule "data/maps/switzerland-geojson"]
+	path = data/maps/switzerland-geojson
+	url = git@github.com:ZHB/switzerland-geojson.git

@@ -1,12 +1,12 @@
 [submodule "data/covid_19"]
-	path = data/covid_19
+	path = data/covid/covid_19
 	url = git@github.com:openZH/covid_19.git
 [submodule "data/scrape_covid19_mobility_reports"]
 	path = data/scrape_covid19_mobility_reports
 	url = git@github.com:philshem/scrape_covid19_mobility_reports.git
 [submodule "data/COVID-19"]
-	path = data/COVID-19
+	path = data/covid/COVID-19
 	url = git@github.com:CSSEGISandData/COVID-19.git
 [submodule "data/covid19monitoring"]
-	path = data/covid19monitoring
+	path = data/monitoring/covid19monitoring
 	url = git@github.com:statistikZH/covid19monitoring.git

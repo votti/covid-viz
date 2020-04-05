@@ -4,3 +4,6 @@
 [submodule "data/scrape_covid19_mobility_reports"]
 	path = data/scrape_covid19_mobility_reports
 	url = git@github.com:philshem/scrape_covid19_mobility_reports.git
+[submodule "data/COVID-19"]
+	path = data/COVID-19
+	url = git@github.com:CSSEGISandData/COVID-19.git

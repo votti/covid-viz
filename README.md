@@ -10,5 +10,7 @@ Trying to keeping it tidy - in Python.
 - google_covid19_mobility_reports: contains worldwide mobility reports scraped by from the pdf mobility reports: https://github.com/philshem/scrape_covid19_mobility_reports
 - COVID-20: Worldwide COVID-19 data from  Johns Hopkins CSSE: https://github.com/CSSEGISandData/COVID-19
 
+- covid19monitoring: Data for diverse mobility indicators for Switzerland, provided by statistikZH: https://github.com/statistikZH/covid19monitoring/
+
 
 

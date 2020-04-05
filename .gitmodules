@@ -7,3 +7,6 @@
 [submodule "data/COVID-19"]
 	path = data/COVID-19
 	url = git@github.com:CSSEGISandData/COVID-19.git
+[submodule "data/covid19monitoring"]
+	path = data/covid19monitoring
+	url = git@github.com:statistikZH/covid19monitoring.git

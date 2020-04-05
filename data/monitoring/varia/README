@@ -1,0 +1,7 @@
+# Directory inventory:
+
+- px-x-0104020000_101:
+"Kantonale Bevölkerungsszenarien 2015-2045, Referenzszenario AR-00-2015 - Zukünftige Bevölkerungsentwicklung der Kantone nach Staatsangehörigkeit (Kategorie), Geschlecht, Alter und Jahr "
+https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/zukuenftige-entwicklung/kantonale-szenarien.assetdetail.255402.html
+
+Note: .px files should be openable by https://pypi.org/project/pyaxis/

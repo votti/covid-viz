@@ -40,13 +40,16 @@ import pandas as pd
 import numpy as np
 import glob
 
+# %%
+import helpers.library as lib
+
 
 # %%
 class C:
     """
     Helper class to keep input configuration.
     """
-    glob_cases = "data/covid_19/fallzahlen_kanton_total_csv/COVID19_Fallzahlen_Kanton_*total.csv"
+    glob_cases = "data/covid/covid_19/fallzahlen_kanton_total_csv/COVID19_Fallzahlen_Kanton_*total.csv"
     
     
 class V:
@@ -104,66 +107,6 @@ dat_total.columns
 # %%
 dat_total.head()
 
-
-# %% [markdown]
-# Helper functions to interpolate data for daily values
-
-# %%
-def transform_daily_per_canton(df, value_cols, col_date=V.COL_DATE, col_canton=V.COL_CANTON,
-                                interpolation='linear'):
-    """
-    Linearily interpolates variables to get daily data.
-    Input:
-        df: a data frame
-        value cols: columns containing the values of interest
-        col_date: column name containing the dates
-        col_canton: columns containing the canton/other grouping
-        interpolation: how to interpolate. See help pd.DataFrame.interpolate(method=
-                       set to 'None' for simple padding of values
-    Returns:
-        Interpolated data with daily values
-    """
-    df = (df
-          .set_index([col_date, col_canton])
-          .loc[:, value_cols]
-         )
-    df = (df
-          .unstack(level=col_canton)
-          #.pivot_table(index=col_date,
-          #             values=value_cols,
-          #             columns=[col_canton],observed=False)
-          
-          # Create a row for every day by reindexing
-          .pipe(lambda d:
-               d.reindex(
-                   pd.DatetimeIndex(pd.date_range(d.index.min(), d.index.max(), freq='D'),
-                                name=col_date))))
-    #return df
-    if interpolation is not None:
-        # If interpolation is used, interpolate betwen
-        # available values.
-        df = df.interpolate(method=interpolation,
-                             limit_area='inside')
-        
-    df = (df
-         # Pad missing values with previous day's number
-         # If interpolation was used, this will pad the tail
-         .fillna(method='pad')
-          
-         # Now there are only missing values at the start
-         # of the series, so set them to zero
-          .fillna(value=0)
-         # Tidy up
-         # Note: 
-         # I think the following should work and would
-         # be way clearer - but it doesnt :(
-         # .stack(level=col_canton)
-         .stack(level=[0,1]).unstack(-2)
-         .reset_index()
-         )
-    return df
-
-
 # %% [markdown]
 # ## Start Visualizations
 #
@@ -180,7 +123,7 @@ dat_total[V.COL_CANTON] = pd.Categorical(dat_total[V.COL_CANTON])
 # Interpolate data to get daily values
 
 # %%
-dat_daily = transform_daily_per_canton(dat_total, V.vars_all)
+dat_daily = lib.transform_daily_per_canton(dat_total, V.vars_all, col_canton=V.COL_CANTON, col_date=V.COL_DATE)
 
 # %% [markdown]
 # Plot the most interesting values over time
@@ -229,18 +172,6 @@ cord = (dat_daily
 )
 cat_cantons_deceased= pd.CategoricalDtype(cord.astype(str), ordered=True)
 
-def order_cat(col, ct, rev=False):
-    """
-    Small helper to convert column to categorical
-    with option to revert order
-    """
-    col = col.astype(ct)
-    if rev:
-        col.cat.set_categories(new_categories=ct.categories[::-1],
-                              ordered=True, inplace=True)
-    return col
-
-
 # %% [markdown]
 # Sorted cantons
 
@@ -255,7 +186,7 @@ g = (dat_daily
                 lambda x: pd.Categorical(x[V.COL_VARIABLES],
                                          categories=cur_vars)
                           .rename_categories(V.vars_labels)})
-         .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=True)})
     
      >>
@@ -291,7 +222,7 @@ g = (dat_daily
                 lambda x: pd.Categorical(x[V.COL_VARIABLES],
                                          categories=cur_vars)
                           .rename_categories(V.vars_labels)})
-         .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=True)})
     
      >>
@@ -326,7 +257,7 @@ g = (dat_daily
                 lambda x: pd.Categorical(x[V.COL_VARIABLES],
                                          categories=cur_vars)
                           .rename_categories(V.vars_labels)})
-         .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=False)})
      >>
      gg.ggplot(gg.aes(x=f'{V.COL_DATE}',
@@ -364,7 +295,7 @@ g = (dat_daily
                 lambda x: pd.Categorical(x[V.COL_VARIABLES],
                                          categories=cur_vars)
                           .rename_categories(V.vars_labels)})
-         .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=False)})
      >>
      gg.ggplot(gg.aes(x=f'{V.COL_DATE}',
@@ -390,7 +321,7 @@ g
 
 # %%
 g = (dat_daily
-    .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+    .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=False)})
      >>
      gg.ggplot(gg.aes(x=f'{V.COL_DATE}'))
@@ -404,7 +335,7 @@ g = (dat_daily
  
 )
     
-dt = (dat_total.assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+dt = (dat_total.assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=False)}))
 for var in V.vars_main:
     (g + gg.geom_line(gg.aes(y=var), color='grey')
@@ -425,7 +356,7 @@ g = (dat_daily
                 lambda x: pd.Categorical(x[V.COL_VARIABLES],
                                          categories=cur_vars)
                           .rename_categories(V.vars_labels)})
-         .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=False)})
      >>
      gg.ggplot(gg.aes(x=f'{V.COL_DATE}',
@@ -459,7 +390,7 @@ g = (dat_daily
                 lambda x: pd.Categorical(x[V.COL_VARIABLES],
                                          categories=cur_vars)
                           .rename_categories(V.vars_labels)})
-         .assign(**{V.COL_CANTON: lambda x: order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
                                                  rev=False)})
      >>
      gg.ggplot(gg.aes(x=f'{V.COL_DATE}',

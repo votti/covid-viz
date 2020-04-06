@@ -73,9 +73,10 @@ class V:
     COL_VARIABLES = 'variable_short'
     COL_VALUE = 'value'
     COL_DATE = 'date'
+    COL_LOCATION = 'location'
     
     # Main data columns
-    cols_data = [COL_VARIABLES, COL_VALUE, COL_DATE]
+    cols_data = [COL_VARIABLES, COL_VALUE, COL_DATE, COL_LOCATION]
     
     # User data columns
     COL_MONTH = 'month'
@@ -200,8 +201,8 @@ dat_zhmonitor.query(f'{V.COL_VARIABLES} == "tages_distanz_median"')
 
 # %%
 p = (dat_zhmonitor 
- .merge(dat_zhmonitor_m[[V.COL_VARIABLES, V.COL_VAR_DESC, V.COL_UNIT]])
- .assign(**{'label': lambda x: x.apply(lambda r: f'{r[V.COL_VARIABLES]}\n{r[V.COL_VAR_DESC]}\nin {r[V.COL_UNIT]}',
+ .merge(dat_zhmonitor_m[[V.COL_VARIABLES, V.COL_VAR_DESC, V.COL_UNIT, V.COL_LOCATION]])
+ .assign(**{'label': lambda x: x.apply(lambda r: f'{r[V.COL_VARIABLES]}\n{r[V.COL_VAR_DESC]}\n{r[V.COL_LOCATION]}\nin {r[V.COL_UNIT]}',
     axis=1)})
  >>    
     gg.ggplot(gg.aes(x=V.COL_DATE, y=V.COL_VALUE, color=V.COL_DAYOFWEEK, shape=V.COL_ISWEEKDAY))
@@ -216,11 +217,13 @@ p = (dat_zhmonitor
      + gg.geom_vline(xintercept=C.days_intervention)
         + gg.theme_minimal()
         + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
-               figure_size=(6,25),
+               figure_size=(6,36),
                    strip_text_y = gg.element_text(angle = 0,ha='left'),
-                   strip_margin_x=6,
+                   strip_margin_x=7,
                 #   legend_position='left'
                )
+     
+ +  gg.ggtitle('Overview of all indicators')
      
 
 )
@@ -233,7 +236,7 @@ p = (dat_zhmonitor
 # It seems that it would be better to only focus on the data since 03.01
 
 (p
- + gg.scale_x_date(limits=[pd.to_datetime('2020-01-03'), dat_zhmonitor[V.COL_DATE].max()],date_breaks='1 week')
+ + gg.scale_x_date(limits=[C.day_start, dat_zhmonitor[V.COL_DATE].max()],date_breaks='1 week')
 
 )
 
@@ -248,14 +251,14 @@ p = (dat_zhmonitor
 # %%
 # Quickly check variability of weekdays vs weekends over weeks
 tdat = (dat_zhmonitor
-        .merge(dat_zhmonitor_m[[V.COL_VARIABLES, V.COL_TOPIC]])
+        .merge(dat_zhmonitor_m[[V.COL_VARIABLES, V.COL_TOPIC, V.COL_LOCATION]])
  #.query(f'{V.COL_DATE} < {C.days_intervention[0]}') # doesnt work with dates yet
  .query(f'{V.COL_HASFULLWEEK} == True')
  .pipe(lambda d: d.loc[d[V.COL_DATE] < C.days_intervention[0],:])# only before intervention
- .groupby([V.COL_DAYOFWEEK, V.COL_VARIABLES, V.COL_TOPIC], observed=True)[V.COL_VALUE].describe()
+ .groupby([V.COL_DAYOFWEEK, V.COL_VARIABLES, V.COL_TOPIC,  V.COL_LOCATION], observed=True)[V.COL_VALUE].describe()
  .reset_index()
  .assign(**{'cv': lambda x: x['std']/np.abs(x['mean'])})
- .assign(**{'cv_norm': lambda d: d.groupby(V.COL_VARIABLES)['cv']
+ .assign(**{'cv_norm': lambda d: d.groupby([V.COL_VARIABLES,  V.COL_LOCATION])['cv']
                   .transform(lambda x: x/x.mean())})
  
        )
@@ -325,7 +328,7 @@ tdat = (dat_zhmonitor
 # %% [markdown]
 # -> Surprisingly (to me) variabiltiy fo the readouts doesnt seem strongly weekday dependent
 #
-# Still I would like to compare weekend and weekday, thus I will normalize by average weekday.
+# Still I would like to compare weekend and weekday, thus ICOL_LOCATIONormalize by average weekday.
 
 # %% [markdown]
 #
@@ -360,8 +363,8 @@ pdat = (dat_zhmonitor
   
  .pipe(lambda d: d.loc[d[V.COL_DATE] >= C.day_start,:])# only before intervention
 .pipe(lambda d: d.loc[np.isfinite(d[V.COL_VALUE_NORM]),:])# only finite
- .merge(dat_zhmonitor_m[[V.COL_VARIABLES, V.COL_VAR_DESC, V.COL_UNIT]])
- .assign(**{'label': lambda x: x.apply(lambda r: f'{r[V.COL_VARIABLES]}\n{r[V.COL_VAR_DESC]}\nin {r[V.COL_UNIT]}',
+ .merge(dat_zhmonitor_m[[V.COL_VARIABLES, V.COL_VAR_DESC, V.COL_UNIT, V.COL_LOCATION]])
+ .assign(**{'label': lambda x: x.apply(lambda r: f'{r[V.COL_VARIABLES]}\n{r[V.COL_VAR_DESC]}\n{r[V.COL_LOCATION]}\nin {r[V.COL_UNIT]}',
     axis=1)})
        )
 p = (pdat >>    
@@ -377,7 +380,7 @@ p = (pdat >>
      + gg.geom_vline(xintercept=C.days_intervention)
         + gg.theme_minimal()
         + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
-               figure_size=(6,25),
+               figure_size=(6,40),
                    strip_text_y = gg.element_text(angle = 0,ha='left'),
                    strip_margin_x=6,
                 #   legend_position='left'
@@ -385,6 +388,7 @@ p = (pdat >>
      
     + gg.scale_x_date(limits=[pdat[V.COL_DATE].min(), pdat[V.COL_DATE].max()],date_breaks='1 week')
     + gg.scale_y_log10()
+    +  gg.ggtitle('Overview of all indicators normalized by week average')
 )
 p
  
@@ -392,10 +396,27 @@ p
 
 
 # %% [markdown]
+# I have to think if using the rolling average of the last 7 days wouldn't be more meaningful.
+
+# %% [markdown]
 # My conda environment
 
 # %%
 import sys
 # !conda env export -p {sys.prefix}
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
+
+# %%
 
 # %%

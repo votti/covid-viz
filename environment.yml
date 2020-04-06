@@ -1,0 +1,13 @@
+name: covid
+channels:
+  - r
+  - bioconda
+  - pyviz
+  - conda-forge
+  - defaults
+dependencies:
+  - colorcet
+  - matplotlib
+  - pandas
+  - numpy
+  - plotnine

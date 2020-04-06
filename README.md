@@ -4,6 +4,8 @@ Some quick exploration of Covid data from Switzerland.
 
 Trying to keeping it tidy - in Python.
 
+Play with the code interactively with Binder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fgithub.com%2Fvotti%2Fcovid-viz.git/master)
+
 ## Data sources
 Datasets are added as Git submodules if possible. This allowes to be reproducible in frequently changing resources.
 

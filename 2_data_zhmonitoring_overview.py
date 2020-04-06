@@ -116,6 +116,7 @@ class V:
 
 
 
+
 # %% [markdown]
 # ## Load and structure data
 
@@ -212,36 +213,51 @@ p = (dat_zhmonitor
         + gg.geom_point(size=1.5)
      + gg.scale_color_cmap_d('Dark2')   
      #+ gg.scale_color_brewer(type='qual',palette=2)
-     + gg.geom_vline(xintercept=[pd.to_datetime(f'2020-{m}-25') for m in range(1,13)],
-                    color='gray', linetype=':')
-     + gg.geom_vline(xintercept=C.days_intervention)
-        + gg.theme_minimal()
+          + gg.geom_vline(color='gray', linetype=':',
+                          xintercept=[pd.to_datetime(f'2020-{m}-25') for m in range(1,13)])
+     + gg.geom_vline(linetype='-', color='b', xintercept=C.days_intervention)
+             + gg.theme_minimal()
         + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
                figure_size=(6,36),
                    strip_text_y = gg.element_text(angle = 0,ha='left'),
                    strip_margin_x=7,
                 #   legend_position='left'
                )
-     
  +  gg.ggtitle('Overview of all indicators')
      
 
 )
 (p
- + gg.scale_x_date(limits=[dat_zhmonitor[V.COL_DATE].min(), dat_zhmonitor[V.COL_DATE].max()],date_breaks='1 week')
+ + gg.scale_x_date(limits=[dat_zhmonitor[V.COL_DATE].min(), dat_zhmonitor[V.COL_DATE].max()],
+                    breaks=pd.date_range(dat_zhmonitor[V.COL_DATE].min(),
+                                         dat_zhmonitor[V.COL_DATE].max(), freq='W-MON'))
+)
+
+# %%
+# It seems that it would be better to only focus on the data since 03.01 - start after XMAS break
+
+(p
+ + gg.scale_x_date(limits=[C.day_start, dat_zhmonitor[V.COL_DATE].max()],
+                   breaks=pd.date_range(dat_zhmonitor[V.COL_DATE].min(),
+                                         dat_zhmonitor[V.COL_DATE].max(), freq='W-MON'))
 
 )
 
 # %%
-# It seems that it would be better to only focus on the data since 03.01
-
-(p
- + gg.scale_x_date(limits=[C.day_start, dat_zhmonitor[V.COL_DATE].max()],date_breaks='1 week')
-
-)
 
 # %% [markdown]
-# After looking at the data, it could indeed be interesting to look at changes in behaviour over the weekdays
+# ### Observations
+#
+# Corona related:
+# - Behaviour of most indicators as one would expect
+#
+# General:
+# - Cool to see how cash withdrawal decreases allways until the next payday
+# - All people move less on weekends
+# - People spend most money abroad on Saturday and monday
+#
+#
+# After looking at the data, it could indeed be interesting to look at changes in behaviour over the weekdays. This seems also a bit more robust against long timescale trends.
 #
 # - Use data from 3. Januar 2020 (Schulanfang)
 # - Week from Monday-Sunday
@@ -328,10 +344,7 @@ tdat = (dat_zhmonitor
 # %% [markdown]
 # -> Surprisingly (to me) variabiltiy fo the readouts doesnt seem strongly weekday dependent
 #
-# Still I would like to compare weekend and weekday, thus ICOL_LOCATIONormalize by average weekday.
-
-# %% [markdown]
-#
+# -> **I normalize over the whole week now.**
 
 # %%
 dat_zhmonitor = (dat_zhmonitor
@@ -375,9 +388,9 @@ p = (pdat >>
         + gg.geom_point(size=1.5)
      + gg.scale_color_cmap_d('Dark2')   
      #+ gg.scale_color_brewer(type='qual',palette=2)
-     + gg.geom_vline(xintercept=[pd.to_datetime(f'2020-{m}-25') for m in range(1,13)],
-                    color='gray', linetype=':')
-     + gg.geom_vline(xintercept=C.days_intervention)
+          + gg.geom_vline(color='gray', linetype=':',
+                          xintercept=[pd.to_datetime(f'2020-{m}-25') for m in range(1,13)])
+     + gg.geom_vline(linetype='-', color='b', xintercept=C.days_intervention)
         + gg.theme_minimal()
         + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
                figure_size=(6,40),
@@ -386,7 +399,8 @@ p = (pdat >>
                 #   legend_position='left'
                )
      
-    + gg.scale_x_date(limits=[pdat[V.COL_DATE].min(), pdat[V.COL_DATE].max()],date_breaks='1 week')
+    + gg.scale_x_date(limits=[pdat[V.COL_DATE].min(), pdat[V.COL_DATE].max()],
+            breaks=pd.date_range(C.day_start,pdat[V.COL_DATE].max(), freq='W-MON'))
     + gg.scale_y_log10()
     +  gg.ggtitle('Overview of all indicators normalized by week average')
 )
@@ -396,7 +410,87 @@ p
 
 
 # %% [markdown]
-# I have to think if using the rolling average of the last 7 days wouldn't be more meaningful.
+# - I have to think if using the rolling average of the last 7 days wouldn't be more meaningful.
+# - Given more data it would be definitely good to take the mean over the previous and next days
+
+# %% [markdown]
+# ### Observations
+# - The main day for shopping stationaries has shifted from Saturday to Friday
+#
+# - Online trainings have traditionally be rarely done on Saturdays.The first two weekends training seems to have been picked up relatively more and now Saturday and Sunday are about equally popular.
+#
+#
+
+# %%
+V.COL_VAR_STAT_EINKAUF = 'stat_einkauf'
+
+p = (pdat
+ .query(f'{V.COL_VARIABLES} in {[V.COL_VAR_STAT_EINKAUF]}')
+ >>    
+    gg.ggplot(gg.aes(x=V.COL_DATE, y=V.COL_VALUE_NORM, color=V.COL_DAYOFWEEK, shape=V.COL_ISWEEKDAY))
+        + gg.facet_grid(f'label~.', scales='free'
+                       )
+          + gg.geom_vline(color='gray', linetype=':',
+                          xintercept=[pd.to_datetime(f'2020-{m}-25') for m in range(1,13)])
+     + gg.geom_vline(linetype='-', color='b', xintercept=C.days_intervention)
+        + gg.geom_line(gg.aes(group=[V.COL_WEEK]))
+        + gg.geom_point(size=1.5)
+     + gg.scale_color_cmap_d('Dark2')   
+     #+ gg.scale_color_brewer(type='qual',palette=2)
+
+        + gg.theme_minimal()
+        + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
+               figure_size=(6,2),
+                   strip_text_y = gg.element_text(angle = 0,ha='left'),
+                   strip_margin_x=6,
+                #   legend_position='left'
+               )
+     
+    + gg.scale_x_date(limits=[pdat[V.COL_DATE].min(), pdat[V.COL_DATE].max()],
+            breaks=pd.date_range(C.day_start,pdat[V.COL_DATE].max(), freq='W-MON'))
+    + gg.scale_y_log10()
+     + gg.ylab('Relative shopping expense')
+     + gg.xlab('Date')
+    +  gg.ggtitle('Overview of stationary shopping expense\nnormalized by calendar week average')
+)
+p
+
+# %%
+p = (pdat
+ .query(f'{V.COL_VARIABLES} in {[V.COL_VAR_STAT_EINKAUF]}')
+ >>    
+    gg.ggplot(gg.aes(x=V.COL_DATE, y=V.COL_VALUE, color=V.COL_DAYOFWEEK, shape=V.COL_ISWEEKDAY))
+        + gg.facet_grid(f'label~.', scales='free'
+                       )
+          + gg.geom_vline(color='gray', linetype=':',
+                          xintercept=[pd.to_datetime(f'2020-{m}-25') for m in range(1,13)])
+     + gg.geom_vline(linetype='-', color='b', xintercept=C.days_intervention,
+                    alpha=0.7)
+        + gg.geom_line(gg.aes(group=[V.COL_WEEK]))
+        + gg.geom_point(size=1.5)
+     + gg.scale_color_cmap_d('Dark2')   
+     + gg.geom_hline(yintercept=0)
+
+          + gg.expand_limits(y=0)
+     
+    + gg.scale_x_date(limits=[pdat[V.COL_DATE].min(), pdat[V.COL_DATE].max()],
+            breaks=pd.date_range(C.day_start,pdat[V.COL_DATE].max(), freq='W-MON'))
+   # + gg.scale_y_log10()
+     
+             + gg.theme_minimal()
+        + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
+               figure_size=(6,2.5),
+                   strip_text_y = gg.element_text(angle = 0,ha='left'),
+                   strip_margin_x=6,
+                #   legend_position='left'
+               )
+     
+     + gg.ylab('Stationary shopping expense\n[Mio. CHF]')
+     + gg.xlab('Date')
+
+    +  gg.ggtitle('Overview of stationary shopping expense',)
+)
+p
 
 # %% [markdown]
 # My conda environment

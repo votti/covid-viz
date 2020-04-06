@@ -15,7 +15,7 @@
 # %% [markdown]
 # # Data overview
 #
-# by Vito Zanotelli <vito.zanotelli@gmail.com>
+# by Vito Zanotelli, <vito.zanotelli@gmail.com>, Zurich 2020
 #
 # ## Aim:
 # This should provides some quick visualization and data exploration over all variables in the openZH/covid19 data repository.

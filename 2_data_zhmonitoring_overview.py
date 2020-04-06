@@ -14,6 +14,7 @@
 
 # %% [markdown]
 # # ZH Monitoring overview
+# by Vito Zanotelli, <vito.zanotelli@gmail.com>, Zurich 2020
 #
 # ## Aim:
 # Get an overview of the statistikZH covid19monitoring dataset (https://github.com/statistikZH/covid19monitoring)
@@ -521,13 +522,10 @@ p
 # My conda environment
 
 # %%
+import sys
+
+# %%
 # !conda env export -p {sys.prefix}
-
-# %%
-
-# %%
-
-# %%
 
 # %%
 

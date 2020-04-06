@@ -182,10 +182,10 @@ dat_zhmonitor[V.COL_ISWEEKDAY] = dat_zhmonitor[V.COL_DATE].dt.dayofweek < 5
 # %%
 
 # %%
-dat_zhmonitor[V.COL_HASFULLWEEK] = dat_zhmonitor.groupby([V.COL_YEAR, V.COL_WEEK, V.COL_VARIABLES])[V.COL_VALUE].transform(lambda x: np.sum(np.isfinite(x)) == 7)
+dat_zhmonitor[V.COL_HASFULLWEEK] = dat_zhmonitor.groupby([V.COL_YEAR, V.COL_WEEK, V.COL_VARIABLES, V.COL_LOCATION])[V.COL_VALUE].transform(lambda x: np.sum(np.isfinite(x)) == 7)
 
 # %%
-dat_zhmonitor[V.COL_HASCLOSEFULLWEEK] = dat_zhmonitor.groupby([V.COL_YEAR, V.COL_WEEK, V.COL_VARIABLES])[V.COL_VALUE].transform(lambda x: np.sum(np.isfinite(x)) >=5)
+dat_zhmonitor[V.COL_HASCLOSEFULLWEEK] = dat_zhmonitor.groupby([V.COL_YEAR, V.COL_WEEK, V.COL_VARIABLES, V.COL_LOCATION])[V.COL_VALUE].transform(lambda x: np.sum(np.isfinite(x)) >=5)
 
 # %%
 dat_zhmonitor[V.COL_DAYOFWEEK].tail()

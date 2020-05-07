@@ -49,7 +49,7 @@ class C:
     """
     Helper class to keep input configuration.
     """
-    glob_cases = "data/covid/covid_19/fallzahlen_kanton_total_csv/COVID19_Fallzahlen_Kanton_*total.csv"
+    glob_cases = "data/covid/covid_19/COVID19_Fallzahlen_CH_total_v2.csv"
     
     
 class V:
@@ -68,9 +68,9 @@ class V:
     COL_CUM_DECEASED = 'ncumul_deceased' # number of deaths
     COL_CUM_TESTED = 'ncumul_tested'
     
-    COL_CUR_HOSP = 'ncumul_hosp'
-    COL_CUR_ICU = 'ncumul_ICU'
-    COL_CUR_VENT = 'ncumul_vent'
+    COL_CUR_HOSP = 'current_hosp'
+    COL_CUR_ICU = 'current_icu'
+    COL_CUR_VENT = 'current_vent'
     
     COL_CUM_RELEASED = 'ncumul_released'
     COL_CUM_CURED = 'TotalCured'
@@ -82,7 +82,7 @@ class V:
                   COL_CUR_ICU: 'Current intensive care cases',
                   COL_CUR_VENT: 'Current ventilator cases',
                   COL_CUM_RELEASED: 'Total released from hospital',
-                  COL_CUM_CURED: 'Total cured cases',
+                  #COL_CUM_CURED: 'Total cured cases',
                   COL_CUM_TESTED: 'Total tested cases'
         
     }
@@ -93,6 +93,8 @@ class V:
                      COL_CUM_DECEASED,
                      COL_CUR_HOSP]
 
+
+# %%
 
 # %% [markdown]
 # Load data
@@ -105,7 +107,7 @@ dat_total = pd.concat(tdats)
 dat_total.columns
 
 # %%
-dat_total.head()
+dat_total.tail()
 
 # %% [markdown]
 # ## Start Visualizations
@@ -411,11 +413,47 @@ g = (dat_daily
 )
 g
 
+# %%
+# linear scale but with individual scaling, without  Total confirmed/tested
+
+cur_vars = V.vars_all
+
+g = (dat_daily
+     .melt(id_vars=[V.COL_DATE, V.COL_CANTON], value_vars=cur_vars,
+           var_name=V.COL_VARIABLES,
+          value_name=V.COL_VALUE)
+     .query(f'{V.COL_VARIABLES} not in {[V.COL_CUM_CONFIRMED, V.COL_CUM_TESTED, V.COL_CUM_RELEASED]}')
+     .assign(**{V.COL_VARIABLES:
+                lambda x: pd.Categorical(x[V.COL_VARIABLES],
+                                         categories=cur_vars)
+                          .rename_categories(V.vars_labels)})
+         .assign(**{V.COL_CANTON: lambda x: lib.order_cat(x[V.COL_CANTON],cat_cantons_deceased,
+                                                 rev=False)})
+     >>
+     gg.ggplot(gg.aes(x=f'{V.COL_DATE}',
+                      y=V.COL_VALUE,
+                      color=V.COL_VARIABLES))
+     + gg.facet_wrap(f'{V.COL_CANTON}', scales='free_y')
+     + gg.geom_line(stat='identity')
+     + gg.scale_color_manual(colorcet.glasbey)
+     + gg.scale_x_datetime(date_breaks='1 week')
+     + gg.xlab('Date')
+     + gg.ylab('Cases')
+     + gg.ggtitle('Cases per canton')
+     + gg.theme_minimal()
+     + gg.theme(axis_text_x = gg.element_text(angle = 90, hjust = 1),
+               figure_size=(10,10),
+                subplots_adjust={'wspace': 0.4})
+ 
+)
+g
+
 # %% [markdown]
 # Where to go from here:
 # - Correlating data with canton population size
 # - Mapping on Swiss map
 # - Spatio-temporal analysis with R-inla?
+# - Idea: Sankey plot with 'hospitalized cases', cantons sorted by nr => Could also be done per country
 
 # %% [markdown]
 # My conda environment

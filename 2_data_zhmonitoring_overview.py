@@ -214,7 +214,7 @@ p = (dat_zhmonitor
                      alpha=0.7)
      + gg.theme_minimal()
      + gg.theme(axis_text_x=gg.element_text(angle=90, hjust=1),
-                figure_size=(6, 36),
+                figure_size=(12, 85),
                 strip_text_y=gg.element_text(angle=0, ha='left'),
                 strip_margin_x=7,
                 #   legend_position='left'
@@ -383,7 +383,7 @@ p = (pdat >>
                      alpha=0.7)
      + gg.theme_minimal()
      + gg.theme(axis_text_x=gg.element_text(angle=90, hjust=1),
-                figure_size=(6, 40),
+                figure_size=(12, 85),
                 strip_text_y=gg.element_text(angle=0, ha='left'),
                 strip_margin_x=6,
                 #   legend_position='left'
